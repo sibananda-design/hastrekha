@@ -4,6 +4,16 @@ import { createServerClient } from "@supabase/ssr";
 const PROTECTED = ["/upload", "/reading"];
 
 export async function middleware(request: NextRequest) {
+  // If Supabase falls back to the Site URL (redirect URL not allow-listed), the auth code
+  // lands on "/" or "/login". Forward it to the callback instead of dropping it.
+  const sp = request.nextUrl.searchParams;
+  if ((sp.has("code") || (sp.has("error") && sp.has("error_description"))) && request.nextUrl.pathname !== "/auth/callback") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    if (!url.searchParams.has("consent")) url.searchParams.set("consent", "1");
+    return NextResponse.redirect(url);
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

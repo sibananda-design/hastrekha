@@ -12,7 +12,9 @@ export async function GET(request: Request) {
   const oauthError = url.searchParams.get("error");
 
   if (oauthError) {
-    const reason = oauthError === "access_denied" ? "oauth_cancelled" : "oauth_failed";
+    const errorCode = url.searchParams.get("error_code");
+    const reason =
+      errorCode === "otp_expired" ? "link_expired" : oauthError === "access_denied" ? "oauth_cancelled" : "oauth_failed";
     return NextResponse.redirect(`${origin}/login?error=${reason}`);
   }
   if (!code) return NextResponse.redirect(`${origin}/login?error=oauth_failed`);
