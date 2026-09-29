@@ -1,14 +1,13 @@
 import "server-only";
-import { createAdminClient } from "@/lib/supabase/admin";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
-/** Records that the user accepted the Terms + entertainment disclaimer (DPDP consent). */
-export async function recordConsent(userId: string) {
-  const admin = createAdminClient();
-  await admin
-    .from("profiles")
-    .update({ terms_accepted_at: new Date().toISOString() })
-    .eq("id", userId)
-    .is("terms_accepted_at", null);
+/**
+ * Records that the signed-in user accepted the Terms + entertainment disclaimer (DPDP consent).
+ * Uses the user's own session via the `accept_terms()` function, which only sets their own timestamp.
+ */
+export async function recordConsent(supabase: SupabaseClient) {
+  const { error } = await supabase.rpc("accept_terms");
+  if (error) console.error("consent: failed", error.message);
 }
 
 export type Profile = {

@@ -6,8 +6,8 @@ import { unauthorized } from "@/lib/http";
 export const runtime = "nodejs";
 
 export async function POST() {
-  const { user } = await getUser();
+  const { supabase, user } = await getUser();
   if (!user) return unauthorized();
-  await recordConsent(user.id);
+  await recordConsent(supabase);
   return NextResponse.json({ ok: true });
 }

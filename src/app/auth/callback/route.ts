@@ -24,7 +24,7 @@ export async function GET(request: Request) {
   }
 
   // The login page only lets people continue after ticking the Terms checkbox.
-  if (url.searchParams.get("consent") === "1") await recordConsent(data.user.id);
+  if (url.searchParams.get("consent") === "1") await recordConsent(supabase);
 
   return NextResponse.redirect(`${origin}/upload`);
 }
